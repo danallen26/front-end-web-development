@@ -1,6 +1,3 @@
-// var alp = require("./alphabet");
-// At some point try and load alphabet in from alphabet.json
-
 $(function () {
     var $canvas = $("#c");
     var canvasHeight;
@@ -14,8 +11,9 @@ $(function () {
         updateCanvasDimensions();
         let rectSize = canvasWidth / 200;
         var g = [];
-        
-        let nameString = ["L", "A", "M", "B", "E", "R", "T", "", "L", "A", "B", "S", "", "L", "T", "D", "PERIOD"];
+
+        let nameString = ["L", "A", "M", "B", "E", "R", "T", "", "L", "A", "B", "S", "",
+                          "L", "T", "D", "PERIOD", ];
 
         var textWidth = nameString.length * 6 * rectSize;
 
