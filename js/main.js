@@ -4,18 +4,8 @@ $(function () {
     var canvasWidth;
     var ctx;
     var dt = 0.1;
-
     var pointCollection;
-
-    // function sleep(miliseconds) {
-    //    var currentTime = new Date().getTime();
-
-    //    while (currentTime + miliseconds >= new Date().getTime()) {
-    //    }
-    // }
-
     var currentTime = new Date().getTime();
-
 
     function init() {
         updateCanvasDimensions();
@@ -28,23 +18,17 @@ $(function () {
         var textWidth = nameString.length * 6 * rectSize;
 
         for (let i = 0; i < nameString.length; i++) {
-            // let stroke = "rgb(155, 155, 155)"
             let stroke = "rgb(190,190,190)"
-
             let fill = "rgba(" + (Math.floor(Math.random() * 255) + 1) + "," + (Math.floor(Math.random() * 255) + 1) + "," + (Math.floor(Math.random() * 255) + 1) + ',.5)';
 
             if (alphabet[nameString[i]]) {
                 for (let j = 0; j < alphabet[nameString[i]].length; j++) {
                     g.push(new roundRectangle(i * 6 * rectSize + rectSize * alphabet[nameString[i]][j][1], rectSize * alphabet[nameString[i]][j][0], 0.0, rectSize, 0, fill, stroke, true));
-                    // g.push(new Rectangle(i * 6 * rectSize + rectSize * alphabet[nameString[i]][j][1], rectSize * alphabet[nameString[i]][j][0], 0.0, rectSize, fill))
                 }
             }
         }
 
         for (var i = 0; i < g.length; i++) {
-            // g[i].curPos.x = (canvasWidth / 2 - 650) + g[i].curPos.x;
-            // g[i].curPos.y = (canvasHeight / 2 - 120) + g[i].curPos.y;
-
             g[i].curPos.x = canvasWidth / 2;
             g[i].curPos.y = canvasHeight / 2;
 
@@ -64,6 +48,7 @@ $(function () {
 
     function initEventListeners() {
         $(window).bind("resize", updateCanvasDimensions).bind("mousemove", onMove);
+        $(window).bind("resize", updateCanvasDimensions).bind("click", onClick);
 
         $canvas.get(0).ontouchmove = function (e) {
             e.preventDefault();
@@ -88,27 +73,29 @@ $(function () {
             pointCollection.mousePos.set(e.pageX, e.pageY);
     };
 
+    function onClick(e) {
+        if (pointCollection) {
+            pointCollection.mousePos.set(e.pageX, e.pageY);
+            explode();
+        }
+
+        console.log("Clicked!!!");
+
+    };
+
     function onTouchMove(e) {
         if (pointCollection)
             pointCollection.mousePos.set(e.targetTouches[0].pageX, e.targetTouches[0].pageY);
     };
 
     function timeout() {
-        draw(); 
-        if (new Date().getTime() > currentTime + 1000){
-            console.log(new Date().getTime());
-            exchange();    
-            currentTime = new Date().getTime();
-        }
-        update();
-        // function timewait() {
-        //     setTimeout(function () {
-        //         exchange();
-        //         timewait();
-        //     }, 5000);
+        draw();
+        // if (new Date().getTime() > currentTime + 1000) {
+        //     exchange();  
+        //     currentTime = new Date().getTime();
         // }
-        // exchange(); // may take random ints to switch blocks
 
+        update();
         setTimeout(function () { timeout(); }, 30);
     };
 
@@ -134,6 +121,11 @@ $(function () {
     function exchange() {
         if (pointCollection)
             pointCollection.exchange();
+    }
+
+    function explode() {
+        if (pointCollection)
+            pointCollection.explode();
     }
 
     function Vector(x, y, z) {
@@ -214,102 +206,47 @@ $(function () {
             };
         };
 
-        var self = this;
         this.exchange = function (wait=true) {
+            var pointsLength = this.points.length;
+            let firstBlock = Math.floor(Math.random() * this.points.length);
+            let secondBlock = Math.floor(Math.random() * this.points.length);
+            let tempTargetPos = this.points[firstBlock].targetPos;
+            let tempFill = this.points[firstBlock].fill;
+            let tempStroke = this.points[firstBlock].stroke;
 
-            // if (wait === true) {
-            //     console.log("wait is true");
-            //     setTimeout(function () {
-            //         self.exchange(false);
-            //         // var pointsLength = that.points.length;
-            //         // let firstBlock = Math.floor(Math.random() * that.points.length);
-            //         // let secondBlock = Math.floor(Math.random() * that.points.length);
-            //         // let tempTargetPos = that.points[firstBlock].targetPos;
+            this.points[firstBlock].targetPos = this.points[secondBlock].targetPos;
+            this.points[firstBlock].fill = this.points[secondBlock].fill;
+            this.points[firstBlock].stroke = this.points[secondBlock].stroke;
 
-            //         // that.points[firstBlock].targetPos = that.points[secondBlock].targetPos;
-            //         // that.points[secondBlock].targetPos = tempTargetPos;
+            this.points[secondBlock].targetPos = tempTargetPos;
+            this.points[secondBlock].fill = tempFill;
+            this.points[secondBlock].stroke = tempStroke;
+        };
 
-            //     }, 5000); 
-            // } else {
-                
+        this.explode = function () {
+            var pointsLength = this.points.length;
 
-                console.log("wait is false");
-                var pointsLength = this.points.length;
-                let firstBlock = Math.floor(Math.random() * this.points.length);
-                let secondBlock = Math.floor(Math.random() * this.points.length);
-                let tempTargetPos = this.points[firstBlock].targetPos;
-                let tempFill = this.points[firstBlock].fill;
-                let tempStroke = this.points[firstBlock].stroke;
+            for (let i = 0; i < pointsLength; i++) {
+                let k = 1;
 
-
-                this.points[firstBlock].targetPos = this.points[secondBlock].targetPos;
-                this.points[firstBlock].fill = this.points[secondBlock].fill;
-                this.points[firstBlock].stroke = this.points[secondBlock].stroke;
-
-
-                this.points[secondBlock].targetPos = tempTargetPos;
-                this.points[secondBlock].fill = tempFill;
-                this.points[secondBlock].stroke = tempStroke;    
-                // setTimeout(function () { timeout(); }, 3000);
-            // }
-
+                let dx = this.mousePos.x - this.points[i].curPos.x;
+                let dy = this.mousePos.y - this.points[i].curPos.y;
+                let dd = (dx * dx) + (dy * dy);
+                let d = Math.sqrt(dd);
+                // this.points[i].velocity.x -= k * dx**2;
+                // this.points[i].velocity.y -= k * dy**2;
+                this.points[i].velocity.x -= Math.floor(Math.random() * 1200 - 600);;
+                this.points[i].velocity.y -= Math.floor(Math.random() * 1200 - 600);;
+            }
         };
     };
-
-        function Rectangle(x, y, z, size, colour) {
-            this.colour = colour;
-            this.curPos = new Vector(x, y, z);
-            this.friction = 0.8; // 0.8
-            this.originalPos = new Vector(x, y, z);
-            // this.radius = size
-            this.size = size;
-            this.springStrength = 0.2;
-            this.targetPos = new Vector(x, y, z);
-            this.velocity = new Vector(0.0, 0.0, 0.0);
-
-            this.update = function() {
-                var dx = this.targetPos.x - this.curPos.x;
-                var ax = dx * this.springStrength;
-                this.velocity.x += ax;
-                this.velocity.x *= this.friction;
-                this.curPos.x += this.velocity.x;
-
-                var dy = this.targetPos.y - this.curPos.y;
-                var ay = dy * this.springStrength;
-                this.velocity.y += ay;
-                this.velocity.y *= this.friction;
-                this.curPos.y += this.velocity.y;
-
-                var dox = this.originalPos.x - this.curPos.x;
-                var doy = this.originalPos.y - this.curPos.y;
-                var dd = (dox * dox) + (doy * doy);
-                var d = Math.sqrt(dd);
-
-                this.targetPos.z = d/100 + 1;
-                var dz = this.targetPos.z - this.curPos.z;
-                var az = dz * this.springStrength;
-                this.velocity.z += az;
-                this.velocity.z *= this.friction;
-                this.curPos.z += this.velocity.z;
-
-                this.radius = this.size*this.curPos.z;
-                if (this.radius < 1) this.radius = 1;
-            };
-
-            this.draw = function() {
-                ctx.fillStyle = this.colour;
-                ctx.beginPath();
-                ctx.rect(this.curPos.x, this.curPos.y, this.size, this.size);
-                ctx.fill();
-            };
-        };
 
     function roundRectangle(x, y, z, size, radius, fill, stroke) {
         this.curPos = new Vector(x, y, z);
         this.friction = 0.8;
         this.originalPos = new Vector(x, y, z);
         this.size = size;
-        this.springStrength = 0.1;
+        this.springStrength = 0.2;
         this.targetPos = new Vector(x, y, z);
         this.velocity = new Vector(0.0, 0.0, 0.0);
         this.fill = fill;
