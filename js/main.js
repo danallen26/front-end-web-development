@@ -7,6 +7,16 @@ $(function () {
 
     var pointCollection;
 
+    // function sleep(miliseconds) {
+    //    var currentTime = new Date().getTime();
+
+    //    while (currentTime + miliseconds >= new Date().getTime()) {
+    //    }
+    // }
+
+    var currentTime = new Date().getTime();
+
+
     function init() {
         updateCanvasDimensions();
         let rectSize = canvasWidth / 200;
@@ -85,7 +95,11 @@ $(function () {
 
     function timeout() {
         draw(); 
-        // exchange();    
+        if (new Date().getTime() > currentTime + 1000){
+            console.log(new Date().getTime());
+            exchange();    
+            currentTime = new Date().getTime();
+        }
         update();
         // function timewait() {
         //     setTimeout(function () {
@@ -170,16 +184,16 @@ $(function () {
                 var dd = (dx * dx) + (dy * dy);
                 var d = Math.sqrt(dd);
 
-                if (d < 150) {
-                    point.targetPos.x = (this.mousePos.x < point.curPos.x) ? point.curPos.x - dx :
-                                                point.curPos.x - dx;
-                    point.targetPos.y = (this.mousePos.y < point.curPos.y) ? point.curPos.y - dy :
-                                                point.curPos.y - dy;
-                } 
-                else {
-                    point.targetPos.x = point.originalPos.x;
-                    point.targetPos.y = point.originalPos.y;
-                };
+                // if (d < 150) {
+                //     point.targetPos.x = (this.mousePos.x < point.curPos.x) ? point.curPos.x - dx :
+                //                                 point.curPos.x - dx;
+                //     point.targetPos.y = (this.mousePos.y < point.curPos.y) ? point.curPos.y - dy :
+                //                                 point.curPos.y - dy;
+                // } 
+                // else {
+                //     point.targetPos.x = point.originalPos.x;
+                //     point.targetPos.y = point.originalPos.y;
+                // };
 
                 // point.targetPos.x = point.originalPos.x;
                 // point.targetPos.y = point.originalPos.y;
@@ -203,20 +217,22 @@ $(function () {
         var self = this;
         this.exchange = function (wait=true) {
 
-            if (wait === true) {
-                console.log("wait is true");
-                setTimeout(function () {
-                    self.exchange(false);
-                    // var pointsLength = that.points.length;
-                    // let firstBlock = Math.floor(Math.random() * that.points.length);
-                    // let secondBlock = Math.floor(Math.random() * that.points.length);
-                    // let tempTargetPos = that.points[firstBlock].targetPos;
+            // if (wait === true) {
+            //     console.log("wait is true");
+            //     setTimeout(function () {
+            //         self.exchange(false);
+            //         // var pointsLength = that.points.length;
+            //         // let firstBlock = Math.floor(Math.random() * that.points.length);
+            //         // let secondBlock = Math.floor(Math.random() * that.points.length);
+            //         // let tempTargetPos = that.points[firstBlock].targetPos;
 
-                    // that.points[firstBlock].targetPos = that.points[secondBlock].targetPos;
-                    // that.points[secondBlock].targetPos = tempTargetPos;
+            //         // that.points[firstBlock].targetPos = that.points[secondBlock].targetPos;
+            //         // that.points[secondBlock].targetPos = tempTargetPos;
 
-                }, 5000); 
-            } else {
+            //     }, 5000); 
+            // } else {
+                
+
                 console.log("wait is false");
                 var pointsLength = this.points.length;
                 let firstBlock = Math.floor(Math.random() * this.points.length);
@@ -235,7 +251,7 @@ $(function () {
                 this.points[secondBlock].fill = tempFill;
                 this.points[secondBlock].stroke = tempStroke;    
                 // setTimeout(function () { timeout(); }, 3000);
-            }
+            // }
 
         };
     };
@@ -243,9 +259,9 @@ $(function () {
         function Rectangle(x, y, z, size, colour) {
             this.colour = colour;
             this.curPos = new Vector(x, y, z);
-            this.friction = 0.8;
+            this.friction = 0.8; // 0.8
             this.originalPos = new Vector(x, y, z);
-            // this.radius = size;
+            // this.radius = size
             this.size = size;
             this.springStrength = 0.2;
             this.targetPos = new Vector(x, y, z);
@@ -293,7 +309,7 @@ $(function () {
         this.friction = 0.8;
         this.originalPos = new Vector(x, y, z);
         this.size = size;
-        this.springStrength = 0.2;
+        this.springStrength = 0.1;
         this.targetPos = new Vector(x, y, z);
         this.velocity = new Vector(0.0, 0.0, 0.0);
         this.fill = fill;
