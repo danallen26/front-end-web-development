@@ -16,7 +16,7 @@ $(function () {
 
     function init() {
         updateCanvasDimensions();
-        let rectSize = canvasWidth / 120;
+        let rectSize = canvasWidth / 150;
         var g = [];
         let nameString = ["L", "A", "M", "B", "E", "R", "T", "", "L", "A", "B", "S", "",
                           "L", "T", "D", "PERIOD"];
@@ -54,7 +54,7 @@ $(function () {
                 for (let j = 0; j < alphabet[nameString[i]].length; j++) {
                     rgb.push([red, grn, blu]);
                     amplitudes.push([redAmp, grnAmp, bluAmp]);
-                    g.push(new roundRectangle(i * 6 * rectSize + rectSize * alphabet[nameString[i]][j][1], rectSize * alphabet[nameString[i]][j][0], 0.0, rectSize, 2, fill, stroke, true));
+                    g.push(new roundRectangle(i * 6 * rectSize + rectSize * alphabet[nameString[i]][j][1], rectSize * alphabet[nameString[i]][j][0], 0.0, rectSize, 1, fill, stroke, true));
                 }
             }
         }
@@ -138,6 +138,10 @@ $(function () {
 
         if (pointCollection)
             pointCollection.draw();
+            ctx.font = '40px Lato';
+            ctx.fillStyle = "rgba(30, 30, 30, 0.5)";
+            ctx.textAlign = "center";
+            ctx.fillText('DevOps for your business.', canvasWidth/2, 3*canvasHeight/4);
     };
 
     function update() {
